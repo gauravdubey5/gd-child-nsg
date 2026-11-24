@@ -1,26 +1,47 @@
-resource "azurerm_network_security_group" "nsg" {
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  tags                = var.tags
 
-  dynamic "security_rule" {
-    for_each = var.security_rules
-    content {
-      name                         = security_rule.value.name
-      priority                     = security_rule.value.priority
-      direction                    = security_rule.value.direction
-      access                       = security_rule.value.access
-      protocol                     = security_rule.value.protocol
-      source_port_range            = security_rule.value.source_port_range
-      source_port_ranges           = security_rule.value.source_port_ranges
-      destination_port_range       = security_rule.value.destination_port_range
-      destination_port_ranges      = security_rule.value.destination_port_ranges
-      source_address_prefix        = security_rule.value.source_address_prefix
-      source_address_prefixes      = security_rule.value.source_address_prefixes
-      destination_address_prefix   = security_rule.value.destination_address_prefix
-      destination_address_prefixes = security_rule.value.destination_address_prefixes
-      description                  = security_rule.value.description
-    }
+resource "azurerm_network_security_group" "network_security_groups" {
+    for_each = var.network_security_group
+  name                = each.value.name
+  location            = each.value.location
+  resource_group_name = each.value.resource_group_name
+
+
+  # SSH Rule
+  security_rule {
+    name                       = "Allow-SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # HTTP Rule
+  security_rule {
+    name                       = "Allow-HTTP"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # HTTPS Rule
+  security_rule {
+    name                       = "Allow-HTTPS"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 }
